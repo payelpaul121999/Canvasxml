@@ -10,7 +10,6 @@ import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import java.lang.Math.abs
 import kotlin.math.cos
 import kotlin.math.sin
