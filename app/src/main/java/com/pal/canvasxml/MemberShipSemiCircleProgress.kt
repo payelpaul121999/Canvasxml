@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.DashPathEffect
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.RectF
@@ -22,8 +23,13 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr)  {
 
-    private val drawableResId = R.drawable.ic_star_icon // Replace with your drawable resource ID
-    private var drawableBitmap: Bitmap? = null
+    private val drawableResId = R.drawable.star_icon // Replace with your drawable resource ID
+    private val drawableResIdStart = R.drawable.ic_point_start_icon // Replace with your drawable resource ID
+    private val drawableResIdEnd = R.drawable.ic_point_g // Replace with your drawable resource ID
+
+    private var drawableBitmapStartPoint: Bitmap? = null
+    private var drawableBitmapEndPoint: Bitmap? = null
+    private var drawableBitmapMiddlePoint: Bitmap? = null
 
     private val arcPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = ContextCompat.getColor(context, R.color.arcColor)
@@ -46,6 +52,11 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
         color = ContextCompat.getColor(context, R.color.DotColor)
         style = Paint.Style.FILL
     }
+    private val dashedArcPaint = Paint().apply {
+        color = Color.parseColor("#B29E7C")
+        style = Paint.Style.STROKE
+        strokeWidth = 5f // Adjust the thickness of the stroke
+    }
     private val arcPaintGradient: Paint
 
     private val arcPaintSolid = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -56,7 +67,9 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
 
     init {
         // Load the drawable image into a Bitmap
-        drawableBitmap = BitmapFactory.decodeResource(resources, drawableResId)
+        drawableBitmapMiddlePoint = BitmapFactory.decodeResource(resources, drawableResId)
+        drawableBitmapStartPoint = BitmapFactory.decodeResource(resources, drawableResIdStart)
+        drawableBitmapEndPoint = BitmapFactory.decodeResource(resources, drawableResIdEnd)
 
         // Create a gradient shader for the paint
         val gradientColors = intArrayOf(
@@ -90,12 +103,17 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
 
     private val radiusForSmallNumber: Float
         get() = (width / 2f) - 37f.dpToPx()
+    private val radiusForDash: Float
+        get() = (width / 2f) - 28f.dpToPx()
 
     private val arcRect: RectF by lazy {
         RectF(centerX - radius, centerY - radius, centerX + radius, centerY + radius)
     }
     private val arcRectSmall: RectF by lazy {
         RectF(centerX - radiusForSmall, centerY - radiusForSmall, centerX + radiusForSmall, centerY + radiusForSmall)
+    }
+    private val arcRectSmallForDash: RectF by lazy {
+        RectF(centerX - radiusForDash, centerY - radiusForDash, centerX + radiusForDash, centerY + radiusForDash)
     }
     private val arcRectSmallNumber: RectF by lazy {
         RectF(centerX - radiusForSmallNumber, centerY - radiusForSmallNumber, centerX + radiusForSmallNumber, centerY + radiusForSmallNumber)
@@ -127,6 +145,13 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
             val x = centerX + radius * Math.cos(Math.toRadians(angle.toDouble())).toFloat()
             val y = centerY + radius * Math.sin(Math.toRadians(angle.toDouble())).toFloat()
             //canvas.drawCircle(x, y, dotRadius, dotPaint)
+
+            val drawableBitmap = when (i) {
+                0 -> drawableBitmapStartPoint
+                4 -> drawableBitmapEndPoint
+                else -> drawableBitmapMiddlePoint
+            }
+
             drawableBitmap?.let {
                 val left = x - it.width / 2f
                 val top = y - it.height / 2f
@@ -142,6 +167,20 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
             val y1 = centerY + radiusForSmallNumber * sin(Math.toRadians(angle.toDouble())).toFloat()
             drawTextOnCanvas(canvas, abs(i).toString(), x1, y1)
         }
+
+
+        // Create the path effect for the dashed line
+        val dashWidth = 40f // Adjust the width of the dashes
+        val gapWidth = 20f // Adjust the width of the gaps
+        val pathEffect = DashPathEffect(floatArrayOf(dashWidth, gapWidth), 0f)
+
+
+
+        // Set the path effect for the paint
+        dashedArcPaint.pathEffect = pathEffect
+
+        // Draw the dashed arc
+        canvas.drawArc(arcRectSmallForDash, startAngle, sweepAngle, false, dashedArcPaint)
 
         // Draw the text inside the arc
         val textFirstItem = "TO RETAIN PLATINUM"
