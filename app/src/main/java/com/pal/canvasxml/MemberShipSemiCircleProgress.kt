@@ -1,6 +1,8 @@
 package com.pal.canvasxml
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.LinearGradient
@@ -19,6 +21,9 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr)  {
+
+    private val drawableResId = R.drawable.ic_star_icon // Replace with your drawable resource ID
+    private var drawableBitmap: Bitmap? = null
 
     private val arcPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = ContextCompat.getColor(context, R.color.arcColor)
@@ -50,6 +55,9 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
     }
 
     init {
+        // Load the drawable image into a Bitmap
+        drawableBitmap = BitmapFactory.decodeResource(resources, drawableResId)
+
         // Create a gradient shader for the paint
         val gradientColors = intArrayOf(
             Color.parseColor("#F2F8F6"),
@@ -118,7 +126,12 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
             val angle = startAngle + angleStep * i
             val x = centerX + radius * Math.cos(Math.toRadians(angle.toDouble())).toFloat()
             val y = centerY + radius * Math.sin(Math.toRadians(angle.toDouble())).toFloat()
-            canvas.drawCircle(x, y, dotRadius, dotPaint)
+            //canvas.drawCircle(x, y, dotRadius, dotPaint)
+            drawableBitmap?.let {
+                val left = x - it.width / 2f
+                val top = y - it.height / 2f
+                canvas.drawBitmap(it, left, top, null)
+            }
         }
         // Calculate the angle step for the text positions
         val angleStepForText = sweepAngle / 5
@@ -149,6 +162,9 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
         drawTextOnCanvas(canvas, textSecItem, textX, arcCenterY2ndItem, 11f, Color.parseColor("#70968D"))
         drawTextOnCanvas(canvas, text3rdItem, textX, arcCenterY3rdItem, 14f, Color.parseColor("#2F2F2F"))
         drawTextOnCanvas(canvas, text4thItem, textX, arcCenterY4thItem, 12f, Color.parseColor("#9D9D9D"))
+
+
+
     }
 
     private fun Float.dpToPx(): Float {
