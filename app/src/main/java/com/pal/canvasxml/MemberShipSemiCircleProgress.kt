@@ -10,6 +10,7 @@ import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import java.lang.Math.abs
 import kotlin.math.cos
 import kotlin.math.sin
@@ -129,6 +130,26 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
             val y1 = centerY + radiusForSmallNumber * sin(Math.toRadians(angle.toDouble())).toFloat()
             drawTextOnCanvas(canvas, abs(i).toString(), x1, y1)
         }
+
+        // Draw the text inside the arc
+        val textFirstItem = "TO RETAIN PLATINUM"
+        val textSecItem = "You require the following or more:"
+        val text3rdItem = "Nights: 10 or Spends: ₹ 50,000"
+        val text4thItem = "by 31st December 2023"
+
+        // Calculate the center position of the arc
+        val arcCenterX = centerX
+        val arcCenterYFirstItem = centerY - (radiusForSmall / 2) - 100f
+        val arcCenterY2ndItem = centerY - (radiusForSmall / 2) - 60f
+        val arcCenterY3rdItem = centerY - (radiusForSmall / 4) - 50f
+        val arcCenterY4thItem = centerY - (radiusForSmall / 10) - 20f
+
+        val textX = arcCenterX - (25f / 2)
+
+        drawTextOnCanvas(canvas, textFirstItem, textX + 20f, arcCenterYFirstItem, 14f, Color.parseColor("#2F2F2F"))
+        drawTextOnCanvas(canvas, textSecItem, textX, arcCenterY2ndItem, 11f, Color.parseColor("#70968D"))
+        drawTextOnCanvas(canvas, text3rdItem, textX, arcCenterY3rdItem, 14f, Color.parseColor("#2F2F2F"))
+        drawTextOnCanvas(canvas, text4thItem, textX, arcCenterY4thItem, 12f, Color.parseColor("#9D9D9D"))
     }
 
     private fun Float.dpToPx(): Float {
@@ -137,10 +158,24 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
     }
     private fun drawTextOnCanvas(canvas: Canvas, text: String, x: Float, y: Float) {
         canvas.drawText(text, x, y, Paint().apply {
-            textSize = 30f // Set your desired text size here
-            color = Color.parseColor("#B29E7C") // Set your desired text color here
+            textSize = 30f
+            color = Color.parseColor("#B29E7C")
             textAlign = Paint.Align.CENTER
         })
+    }
+
+    private fun drawTextOnCanvas(canvas: Canvas, text: String, x: Float, y: Float, textSize: Float, textColor: Int) {
+        canvas.drawText(
+            text,
+            x,
+            y,
+            Paint().apply {
+                this.textSize = textSize.dpToPx()
+                textAlign = Paint.Align.CENTER
+                color = textColor
+               // typeface = ResourcesCompat.getFont(context, R.font.your_font) // Replace with your desired font
+            }
+        )
     }
 }
 
