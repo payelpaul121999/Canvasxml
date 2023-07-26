@@ -10,7 +10,10 @@ import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Shader
+import android.media.MediaDrm.LogMessage
 import android.util.AttributeSet
+import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
 import java.lang.Math.abs
@@ -22,7 +25,9 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr)  {
-
+    // Keep track of the bounding rectangles of the bitmaps
+    private val bitmapRects = mutableListOf<RectF>()
+    private var clickedPointIndex: Int = -1
     private val drawableResId = R.drawable.star_icon // Replace with your drawable resource ID
     private val drawableResIdStart = R.drawable.ic_point_start_icon // Replace with your drawable resource ID
     private val drawableResIdEnd = R.drawable.ic_point_g // Replace with your drawable resource ID
@@ -64,12 +69,39 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
         style = Paint.Style.STROKE
         strokeWidth = 20f
     }
+    val startAngle = -180f
+    val sweepAngle = 180f
+    val dotRadius = 35f
+    val angleStep = sweepAngle / 4
 
     init {
         // Load the drawable image into a Bitmap
         drawableBitmapMiddlePoint = BitmapFactory.decodeResource(resources, drawableResId)
         drawableBitmapStartPoint = BitmapFactory.decodeResource(resources, drawableResIdStart)
         drawableBitmapEndPoint = BitmapFactory.decodeResource(resources, drawableResIdEnd)
+
+        // Add the bounding rectangles to the list during initialization
+        for (i in 0..4) {
+            val angle = startAngle + angleStep * i
+            val x = centerX + radius * Math.cos(Math.toRadians(angle.toDouble())).toFloat()
+            val y = centerY + radius * Math.sin(Math.toRadians(angle.toDouble())).toFloat()
+
+            val drawableBitmap = when (i) {
+                0 -> drawableBitmapStartPoint
+                4 -> drawableBitmapEndPoint
+                else -> drawableBitmapMiddlePoint
+            }
+
+            drawableBitmap?.let {
+                val left = x - it.width / 2f
+                val top = y - it.height / 2f
+                val right = left + it.width
+                val bottom = top + it.height
+
+                val rect = RectF(left, top, right, bottom)
+                bitmapRects.add(rect)
+            }
+        }
 
         // Create a gradient shader for the paint
         val gradientColors = intArrayOf(
@@ -121,10 +153,10 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val startAngle = -180f
+       /* val startAngle = -180f
         val sweepAngle = 180f
         val dotRadius = 35f
-        val angleStep = sweepAngle / 4
+        val angleStep = sweepAngle / 4*/
 
         canvas.drawArc(arcRect, startAngle, sweepAngle, false, arcPaint)
         canvas.drawArc(arcRect,startAngle,75f,false,arcPaintForProgress)
@@ -169,7 +201,7 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
         }
 
 
-        // Create the path effect for the dashed line
+        /*// Create the path effect for the dashed line
         val dashWidth = 40f // Adjust the width of the dashes
         val gapWidth = 20f // Adjust the width of the gaps
         val pathEffect = DashPathEffect(floatArrayOf(dashWidth, gapWidth), 0f)
@@ -181,6 +213,7 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
 
         // Draw the dashed arc
         canvas.drawArc(arcRectSmallForDash, startAngle, sweepAngle, false, dashedArcPaint)
+*/
 
         // Draw the text inside the arc
         val textFirstItem = "TO RETAIN PLATINUM"
@@ -205,7 +238,6 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
 
 
     }
-
     private fun Float.dpToPx(): Float {
         val scale = context.resources.displayMetrics.density
         return this * scale + 0.5f
@@ -230,6 +262,48 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
                // typeface = ResourcesCompat.getFont(context, R.font.your_font) // Replace with your desired font
             }
         )
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                val x = event.x
+                val y = event.y
+
+                // Loop through the points to check if touch event is within any point
+                for (i in 0..4) {
+                    val angle = startAngle + angleStep * i
+                    val pointX = centerX + radius * Math.cos(Math.toRadians(angle.toDouble())).toFloat()
+                    val pointY = centerY + radius * Math.sin(Math.toRadians(angle.toDouble())).toFloat()
+
+                    val drawableBitmap = when (i) {
+                        0 -> drawableBitmapStartPoint
+                        4 -> drawableBitmapEndPoint
+                        else -> drawableBitmapMiddlePoint
+                    }
+
+                    drawableBitmap?.let {
+                        val left = pointX - it.width / 2f
+                        val top = pointY - it.height / 2f
+
+                        if (x >= left && x <= left + it.width && y >= top && y <= top + it.height) {
+                            // The touch event is inside the bounds of the current point
+                            // Handle the click event for this point
+                            // Do something here based on the clicked point (i)
+                            // For example: perform an action, show a toast, etc.
+                            clickedPointIndex = i
+                            invalidate()
+                            Log.d("JAPAN","Click Perform once $clickedPointIndex")
+                            return true
+                        }
+                    }
+                }
+
+                clickedPointIndex = -1
+                invalidate()
+            }
+        }
+        return super.onTouchEvent(event)
     }
 }
 
