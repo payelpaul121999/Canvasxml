@@ -33,6 +33,19 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
     var textSecItem = "You require the following or more:"
     var text3rdItem = "Nights: 10 or Spends: ₹ 50,000"
     var text4thItem = "by 31st December 2023"
+
+    //Text Size
+    private var textFirstItemSize :  Float = 0f
+    private var textSecondItemSize :  Float = 0f
+    private var text3rdItemSize :  Float = 0f
+    private var text4thItemSize :  Float = 0f
+
+    //Text Color
+    private var textFirstTextColor : Int = R.color.textFirstColor
+    private var textSecondTextColor : Int = R.color.textSecondColor
+    private var text3rdTextColor : Int = R.color.text3rdColor
+    private var text4thTextColor : Int = R.color.text4thColor
+
     // Replace with your drawable resource ID
     private val drawableResId = R.drawable.star_icon
     private val drawableResIdStart = R.drawable.ic_point_start_icon
@@ -124,26 +137,69 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
             gradientColors, gradientPositions, Shader.TileMode.CLAMP
         )
 
-
         // Set the gradient shader as the paint's color
         arcPaintGradient = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             shader = gradient
+        }
+        context.theme.obtainStyledAttributes(
+            attrs,
+            R.styleable.SemicircleView,
+            0, 0).apply {
+            try {
+
+                textFirstItemSize = getDimension(
+                    R.styleable.SemicircleView_text_size_for_first_item,
+                    14f)
+                textSecondItemSize = getDimension(
+                    R.styleable.SemicircleView_text_size_for_second_item,
+                    11f)
+                text3rdItemSize = getDimension(
+                    R.styleable.SemicircleView_text_size_for_third_item,
+                    14f)
+                text4thItemSize = getDimension(
+                    R.styleable.SemicircleView_text_size_for_forth_item,
+                    12f)
+
+                textFirstTextColor = getInt(
+                   R.styleable.SemicircleView_text_color_for_first_item,
+                   R.color.textFirstColor)
+                textSecondTextColor = getInt(
+                    R.styleable.SemicircleView_text_color_for_second_item,
+                    R.color.textSecondColor)
+                text3rdTextColor = getInt(
+                    R.styleable.SemicircleView_text_color_for_third_item,
+                    R.color.text3rdColor)
+                text4thTextColor = getInt(
+                    R.styleable.SemicircleView_text_color_for_forth_item,
+                    R.color.text4thColor)
+
+                /*titleTextFont = getInt(
+                    R.styleable.GaugeView_title_text_font,
+                    R.font.sf_pro_text_bold
+                )*/
+            }finally {
+                recycle()
+            }
         }
     }
     private val MARGIN_FORM_WIDTH = 10f
     private val centerX: Float
         get() = width / 2f
 
-    private val centerY: Float
-        get() = height / 2f + 50f
+
 
     private val radiusA: Float
-        get() = (width / 2f)
+        get() = (width / 4.7f)
+    private val centerY: Float
+        get() = height / 2f + radiusA
+
     private val valueSUBTRACT: Float
-        get() = (width * 0.08f)
+        get() = (width * 0.05f)
 
     private val radius: Float
-        get() = (width / 2f) - 10f.dpToPx()
+        get() = (width / 2f) - valueSUBTRACT
+
+
 
     //40f
     private val radiusForSmall: Float
@@ -227,15 +283,11 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
         val dashWidth = 40f // Adjust the width of the dashes
         val gapWidth = 20f // Adjust the width of the gaps
         val pathEffect = DashPathEffect(floatArrayOf(dashWidth, gapWidth), 0f)
-
-
-
         // Set the path effect for the paint
         dashedArcPaint.pathEffect = pathEffect
-
         // Draw the dashed arc
         canvas.drawArc(arcRectSmallForDash, startAngle, sweepAngle, false, dashedArcPaint)
-*/
+       */
 
 
 
@@ -250,10 +302,10 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
 
         val textX = arcCenterX - (25f / 2)
 
-        drawTextOnCanvas(canvas, textFirstItem, textX + 20f, arcCenterYFirstItem, 14f, Color.parseColor("#2F2F2F"))
-        drawTextOnCanvas(canvas, textSecItem, textX, arcCenterY2ndItem, 11f, Color.parseColor("#70968D"))
-        drawTextOnCanvas(canvas, text3rdItem, textX, arcCenterY3rdItem, 14f, Color.parseColor("#2F2F2F"))
-        drawTextOnCanvas(canvas, text4thItem, textX, arcCenterY4thItem, 12f, Color.parseColor("#9D9D9D"))
+        drawTextOnCanvas(canvas, textFirstItem, textX + 20f, arcCenterYFirstItem, textFirstItemSize, ContextCompat.getColor(context!!,textFirstTextColor))
+        drawTextOnCanvas(canvas, textSecItem, textX, arcCenterY2ndItem, textSecondItemSize, ContextCompat.getColor(context!!,textSecondTextColor))
+        drawTextOnCanvas(canvas, text3rdItem, textX, arcCenterY3rdItem, text3rdItemSize, ContextCompat.getColor(context!!,text3rdTextColor))
+        drawTextOnCanvas(canvas, text4thItem, textX, arcCenterY4thItem, text4thItemSize, ContextCompat.getColor(context!!,text4thTextColor))
 
 
 

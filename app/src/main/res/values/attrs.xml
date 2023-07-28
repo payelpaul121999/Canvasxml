@@ -3,5 +3,14 @@
     <declare-styleable name="SemicircleView">
         <attr name="dynamicHeight" format="dimension" />
         <attr name="dynamicWeight" format="float" />
+        <attr name="text_size_for_first_item" format="dimension" />
+        <attr name="text_size_for_second_item" format="dimension" />
+        <attr name="text_size_for_third_item" format="dimension" />
+        <attr name="text_size_for_forth_item" format="dimension" />
+
+        <attr name="text_color_for_first_item" format="color" />
+        <attr name="text_color_for_second_item" format="color" />
+        <attr name="text_color_for_third_item" format="color" />
+        <attr name="text_color_for_forth_item" format="color" />
     </declare-styleable>
 </resources>
