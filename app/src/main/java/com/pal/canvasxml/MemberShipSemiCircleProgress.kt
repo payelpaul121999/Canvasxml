@@ -5,12 +5,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.DashPathEffect
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Shader
-import android.media.MediaDrm.LogMessage
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -28,13 +26,24 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
     // Keep track of the bounding rectangles of the bitmaps
     private val bitmapRects = mutableListOf<RectF>()
     private var clickedPointIndex: Int = -1
-    private val drawableResId = R.drawable.star_icon // Replace with your drawable resource ID
-    private val drawableResIdStart = R.drawable.ic_point_start_icon // Replace with your drawable resource ID
-    private val drawableResIdEnd = R.drawable.ic_point_g // Replace with your drawable resource ID
+
+    private var progressCount = 40
+    // Draw the text inside the arc
+    var textFirstItem = "TO RETAIN PLATINUM"
+    var textSecItem = "You require the following or more:"
+    var text3rdItem = "Nights: 10 or Spends: ₹ 50,000"
+    var text4thItem = "by 31st December 2023"
+    // Replace with your drawable resource ID
+    private val drawableResId = R.drawable.star_icon
+    private val drawableResIdStart = R.drawable.ic_point_start_icon
+    private val drawableResIdEnd = R.drawable.ic_point_g
+    private val drawableProgressMarker = R.drawable.ic_cir_dot_icon
+
 
     private var drawableBitmapStartPoint: Bitmap? = null
     private var drawableBitmapEndPoint: Bitmap? = null
     private var drawableBitmapMiddlePoint: Bitmap? = null
+    private var drawableBitmapProgress: Bitmap? = null
 
     private val arcPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = ContextCompat.getColor(context, R.color.arcColor)
@@ -71,7 +80,6 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
     }
     val startAngle = -180f
     val sweepAngle = 180f
-    val dotRadius = 35f
     val angleStep = sweepAngle / 4
 
     init {
@@ -79,6 +87,7 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
         drawableBitmapMiddlePoint = BitmapFactory.decodeResource(resources, drawableResId)
         drawableBitmapStartPoint = BitmapFactory.decodeResource(resources, drawableResIdStart)
         drawableBitmapEndPoint = BitmapFactory.decodeResource(resources, drawableResIdEnd)
+        drawableBitmapProgress = BitmapFactory.decodeResource(resources, drawableProgressMarker)
 
         // Add the bounding rectangles to the list during initialization
         for (i in 0..4) {
@@ -121,22 +130,30 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
             shader = gradient
         }
     }
+    private val MARGIN_FORM_WIDTH = 10f
     private val centerX: Float
         get() = width / 2f
 
     private val centerY: Float
-        get() = height / 2f
+        get() = height / 2f + 50f
+
+    private val radiusA: Float
+        get() = (width / 2f)
+    private val valueSUBTRACT: Float
+        get() = (width * 0.08f)
 
     private val radius: Float
         get() = (width / 2f) - 10f.dpToPx()
 
+    //40f
     private val radiusForSmall: Float
-        get() = (width / 2f) - 40f.dpToPx()
-
+        get() = radius - (valueSUBTRACT + 30f).toInt()
+       // get() = radius - (valueSUBTRACT * 4f).toInt()
+   //37f
     private val radiusForSmallNumber: Float
-        get() = (width / 2f) - 37f.dpToPx()
+        get() =  radius- (valueSUBTRACT + 27f).toInt()
     private val radiusForDash: Float
-        get() = (width / 2f) - 28f.dpToPx()
+        get() = radius - (valueSUBTRACT + 18f).toInt()
 
     private val arcRect: RectF by lazy {
         RectF(centerX - radius, centerY - radius, centerX + radius, centerY + radius)
@@ -153,13 +170,10 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-       /* val startAngle = -180f
-        val sweepAngle = 180f
-        val dotRadius = 35f
-        val angleStep = sweepAngle / 4*/
+       Log.d("JAPAN","${radiusA} $width ${valueSUBTRACT.toInt()} ${(valueSUBTRACT * 4f).toInt()} $radiusForSmall $radius")
 
         canvas.drawArc(arcRect, startAngle, sweepAngle, false, arcPaint)
-        canvas.drawArc(arcRect,startAngle,75f,false,arcPaintForProgress)
+        canvas.drawArc(arcRect,startAngle, angleValue(progressCount),false,arcPaintForProgress)
 
         // Calculate the bounding rectangle of the arc
         val left = centerX - radiusForSmall
@@ -170,6 +184,14 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
         canvas.drawArc(left, top, right, bottom, startAngle, sweepAngle, false, arcPaintSolid)
         canvas.drawArc(left, top, right, bottom, startAngle, sweepAngle, true, arcPaintGradient)
         canvas.drawArc(arcRectSmall, startAngle, sweepAngle, false, arcPaintSmall)
+
+        /* draw dot on the arc */
+        drawableBitmapProgress?.let {
+            val angle = startAngle + angleValue(progressCount)
+            val x = centerX + radius * cos(Math.toRadians(angle.toDouble())).toFloat()
+            val y = centerY + radius * sin(Math.toRadians(angle.toDouble())).toFloat()
+            canvas.drawBitmap(it, x - it.width / 2f, y - it.height / 2f, null)
+        }
 
         // Draw the dot points on the arc
         for (i in 0..4) {
@@ -215,18 +237,16 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
         canvas.drawArc(arcRectSmallForDash, startAngle, sweepAngle, false, dashedArcPaint)
 */
 
-        // Draw the text inside the arc
-        val textFirstItem = "TO RETAIN PLATINUM"
-        val textSecItem = "You require the following or more:"
-        val text3rdItem = "Nights: 10 or Spends: ₹ 50,000"
-        val text4thItem = "by 31st December 2023"
+
 
         // Calculate the center position of the arc
         val arcCenterX = centerX
-        val arcCenterYFirstItem = centerY - (radiusForSmall / 2) - 100f
-        val arcCenterY2ndItem = centerY - (radiusForSmall / 2) - 60f
-        val arcCenterY3rdItem = centerY - (radiusForSmall / 4) - 50f
-        val arcCenterY4thItem = centerY - (radiusForSmall / 10) - 20f
+        val arcCenterYFirstItem = centerY - (radiusForSmall / 1.5f)
+        val arcCenterY2ndItem = centerY - (radiusForSmall / 2)
+        val arcCenterY3rdItem = centerY - (radiusForSmall / 3.5f)
+        val arcCenterY4thItem = centerY - (radiusForSmall / 10)
+
+
 
         val textX = arcCenterX - (25f / 2)
 
@@ -287,10 +307,6 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
                         val top = pointY - it.height / 2f
 
                         if (x >= left && x <= left + it.width && y >= top && y <= top + it.height) {
-                            // The touch event is inside the bounds of the current point
-                            // Handle the click event for this point
-                            // Do something here based on the clicked point (i)
-                            // For example: perform an action, show a toast, etc.
                             clickedPointIndex = i
                             invalidate()
                             Log.d("JAPAN","Click Perform once $clickedPointIndex")
@@ -304,6 +320,14 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
             }
         }
         return super.onTouchEvent(event)
+    }
+
+    private fun angleValue(progressCount:Int): Float {
+        return (9 / 5.0f) * progressCount
+    }
+    fun setProgressCount(progressCount: Int){
+        this.progressCount = progressCount
+        invalidate()
     }
 }
 
