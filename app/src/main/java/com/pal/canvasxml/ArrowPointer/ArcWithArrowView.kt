@@ -27,7 +27,7 @@ class ArcWithArrowView @JvmOverloads constructor(
     }
 
     private val startAngle = -180f
-    private val sweepAngle = 100f
+    private val sweepAngle = 120f
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -63,8 +63,9 @@ class ArcWithArrowView @JvmOverloads constructor(
         // Draw the arrowhead outline
         val path = Path().apply {
             moveTo(endX , endY )
-            lineTo(arrowEndPointX, arrowEndPointY)
-            lineTo(endX + arrowSize * cos(Math.toRadians((startAngle + sweepAngle + 140).toDouble())).toFloat(), endY + arrowSize * sin(Math.toRadians((startAngle + sweepAngle + 140).toDouble())).toFloat()
+            lineTo(arrowEndPointX, arrowEndPointY )
+            lineTo(endX + arrowSize * cos(Math.toRadians((startAngle + sweepAngle + 140).toDouble())).toFloat(),
+                endY + arrowSize * sin(Math.toRadians((startAngle + sweepAngle +140).toDouble())).toFloat()
             )
             close()
         }
