@@ -57,8 +57,8 @@ class ArcWithArrowView @JvmOverloads constructor(
 
         // Calculate the coordinates of the arrowhead
         val arrowSize = 120f // Modify the size of the arrowhead as needed
-        val arrowEndPointX = endX + arrowSize * cos(Math.toRadians((startAngle + sweepAngle + 270).toDouble())).toFloat()
-        val arrowEndPointY = endY + arrowSize * sin(Math.toRadians((startAngle + sweepAngle + 270).toDouble())).toFloat()
+        val arrowEndPointX = endX + arrowSize * cos(Math.toRadians((startAngle + sweepAngle + 180).toDouble())).toFloat()
+        val arrowEndPointY = endY + arrowSize * sin(Math.toRadians((startAngle + sweepAngle + 180).toDouble())).toFloat()
 
         // Draw the arrowhead outline
         val path = Path().apply {
