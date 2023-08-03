@@ -1,6 +1,6 @@
 package com.pal.canvasxml
 
-import android.content.Context
+/*import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -9,8 +9,9 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import kotlin.math.cos
-import kotlin.math.sin
+import kotlin.math.sin*/
 
+/*
 class ArcWithTriangleView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
 
 
@@ -44,5 +45,65 @@ class ArcWithTriangleView(context: Context, attrs: AttributeSet?) : View(context
 
 
 
+    }
+}
+*/
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.util.AttributeSet
+import android.util.Log
+import android.view.View
+import kotlin.math.cos
+import kotlin.math.sin
+
+class ArcWithPointerView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
+
+    // Arc properties
+    private val arcStartAngle = -180f
+    private val arcSweepAngle = 180f
+    private val arcStrokeWidth = 10f
+    private val arcColor = Color.BLUE
+
+    // Pointer properties
+    private val pointerLength = 100f
+    private val pointerWidth = 6f
+    private val pointerColor = Color.RED
+
+    // Paints
+    private val arcPaint = Paint().apply {
+        color = arcColor
+        style = Paint.Style.STROKE
+        strokeWidth = arcStrokeWidth
+        isAntiAlias = true
+    }
+
+    private val pointerPaint = Paint().apply {
+        color = pointerColor
+        style = Paint.Style.STROKE
+        strokeWidth = pointerWidth
+        isAntiAlias = true
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+
+        val centerX = width / 2f
+        val centerY = height / 2f
+        val radius =  width / 2f
+        val centerWidth = width / 8f
+        Log.e("JAPAN","$centerWidth")
+        val rect = RectF(centerX - radius, centerY - radius, centerX + radius, centerY + radius)
+        canvas.drawArc(rect, arcStartAngle, arcSweepAngle, false, arcPaint)
+
+        // Calculate the pointer endpoint
+        val pointerEndpointX = centerX + radius * cos(Math.toRadians(arcStartAngle + arcSweepAngle.toDouble())).toFloat()
+        val pointerEndpointY = centerY + radius * sin(Math.toRadians(arcStartAngle + arcSweepAngle.toDouble())).toFloat()
+
+        // Draw the pointer line
+        canvas.drawLine(centerX + centerWidth, centerY + centerWidth, pointerEndpointX, pointerEndpointY , pointerPaint)
     }
 }

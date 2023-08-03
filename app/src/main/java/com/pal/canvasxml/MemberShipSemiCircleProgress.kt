@@ -6,7 +6,9 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.LinearGradient
+import android.graphics.Matrix
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.RectF
 import android.graphics.Shader
 import android.util.AttributeSet
@@ -51,12 +53,14 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
     private val drawableResIdStart = R.drawable.ic_point_start_icon
     private val drawableResIdEnd = R.drawable.ic_point_g
     private val drawableProgressMarker = R.drawable.ic_cir_dot_icon
+    private val drawableTriangle = R.drawable.trianlge_left
 
 
     private var drawableBitmapStartPoint: Bitmap? = null
     private var drawableBitmapEndPoint: Bitmap? = null
     private var drawableBitmapMiddlePoint: Bitmap? = null
     private var drawableBitmapProgress: Bitmap? = null
+    private var drawableBitmapTriangle: Bitmap? = null
 
     private val arcPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = ContextCompat.getColor(context, R.color.arcColor)
@@ -94,13 +98,14 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
     val startAngle = -180f
     val sweepAngle = 180f
     val angleStep = sweepAngle / 4
-
+    val sweepAngleForArrowPointer = 90f
     init {
         // Load the drawable image into a Bitmap
         drawableBitmapMiddlePoint = BitmapFactory.decodeResource(resources, drawableResId)
         drawableBitmapStartPoint = BitmapFactory.decodeResource(resources, drawableResIdStart)
         drawableBitmapEndPoint = BitmapFactory.decodeResource(resources, drawableResIdEnd)
         drawableBitmapProgress = BitmapFactory.decodeResource(resources, drawableProgressMarker)
+        drawableBitmapTriangle = BitmapFactory.decodeResource(resources, drawableTriangle)
 
         // Add the bounding rectangles to the list during initialization
         for (i in 0..4) {
@@ -223,6 +228,11 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
     private val arcRectSmallNumber: RectF by lazy {
         RectF(centerX - radiusForSmallNumber, centerY - radiusForSmallNumber, centerX + radiusForSmallNumber, centerY + radiusForSmallNumber)
     }
+    private val arcPaintT = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.arcColorProgress)
+        strokeWidth = 10f
+        isAntiAlias = true
+    }
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -248,6 +258,14 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
             val y = centerY + radius * sin(Math.toRadians(angle.toDouble())).toFloat()
             canvas.drawBitmap(it, x - it.width / 2f, y - it.height / 2f, null)
         }
+
+        /*drawableBitmapTriangle?.let {
+            val angle = startAngle + angleValue(50)
+            val x = centerX + radiusForDash * cos(Math.toRadians(angle.toDouble())).toFloat()
+            val y = centerY + radiusForDash * sin(Math.toRadians(angle.toDouble())).toFloat()
+            canvas.drawBitmap(it, x - it.width / 2f, y - it.height / 2f, null)
+        }*/
+
 
         // Draw the dot points on the arc
         for (i in 0..4) {
@@ -288,8 +306,30 @@ class MemberShipSemiCircleProgress@JvmOverloads constructor(
         // Draw the dashed arc
         canvas.drawArc(arcRectSmallForDash, startAngle, sweepAngle, false, dashedArcPaint)
        */
+        val endX = centerX  + radius * cos(Math.toRadians((startAngle + sweepAngleForArrowPointer).toDouble())).toFloat()
+        val endY = centerY + radius * sin(Math.toRadians((startAngle + sweepAngleForArrowPointer).toDouble())).toFloat()
 
+        // Calculate the coordinates of the arrowhead
+        val arrowSize = 80f // Modify the size of the arrowhead as needed
+        val arrowEndPointX = endX + arrowSize * cos(Math.toRadians((startAngle + sweepAngleForArrowPointer + 180).toDouble())).toFloat()
+        val arrowEndPointY = endY + arrowSize * sin(Math.toRadians((startAngle + sweepAngleForArrowPointer + 180).toDouble())).toFloat()
 
+        // Draw the arrowhead outline
+        val path = Path().apply {
+            moveTo(endX , endY )
+            lineTo(arrowEndPointX, arrowEndPointY)
+            lineTo(
+                endX + arrowSize * cos(Math.toRadians((startAngle + sweepAngleForArrowPointer + 140).toDouble())).toFloat(),
+                endY + arrowSize * sin(Math.toRadians((startAngle + sweepAngleForArrowPointer + 140).toDouble())).toFloat()
+            )
+            close()
+        }
+        // Rotate the arrow path according to the arc angle
+        val angleDegrees = (startAngle + sweepAngleForArrowPointer + 90).toFloat()
+        val matrix = Matrix()
+        matrix.setRotate(angleDegrees, arrowEndPointX, arrowEndPointY)
+        path.transform(matrix)
+        canvas.drawPath(path, arcPaintT)
 
         // Calculate the center position of the arc
         val arcCenterX = centerX

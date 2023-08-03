@@ -27,14 +27,14 @@ class ArcWithArrowView @JvmOverloads constructor(
     }
 
     private val startAngle = -180f
-    private val sweepAngle = 180f
+    private val sweepAngle = 100f
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         val centerX = width / 2f
         val centerY = height / 2f
-        val radius = (centerX.coerceAtMost(centerY) * 0.8).toFloat()
+        val radius = (centerX.coerceAtMost(centerY) * 0.9).toFloat()
 
         // Calculate the start and end points of the arc
         val startX = centerX + radius * cos(Math.toRadians(startAngle.toDouble())).toFloat()
@@ -57,16 +57,14 @@ class ArcWithArrowView @JvmOverloads constructor(
 
         // Calculate the coordinates of the arrowhead
         val arrowSize = 120f // Modify the size of the arrowhead as needed
-        val arrowEndPointX = endX + arrowSize * cos(Math.toRadians((startAngle + sweepAngle + 180).toDouble())).toFloat()
-        val arrowEndPointY = endY + arrowSize * sin(Math.toRadians((startAngle + sweepAngle + 180).toDouble())).toFloat()
+        val arrowEndPointX = endX + arrowSize * cos(Math.toRadians((startAngle + sweepAngle + 270).toDouble())).toFloat()
+        val arrowEndPointY = endY + arrowSize * sin(Math.toRadians((startAngle + sweepAngle + 270).toDouble())).toFloat()
 
         // Draw the arrowhead outline
         val path = Path().apply {
             moveTo(endX , endY )
             lineTo(arrowEndPointX, arrowEndPointY)
-            lineTo(
-                endX + arrowSize * cos(Math.toRadians((startAngle + sweepAngle + 140).toDouble())).toFloat(),
-                endY + arrowSize * sin(Math.toRadians((startAngle + sweepAngle + 140).toDouble())).toFloat()
+            lineTo(endX + arrowSize * cos(Math.toRadians((startAngle + sweepAngle + 140).toDouble())).toFloat(), endY + arrowSize * sin(Math.toRadians((startAngle + sweepAngle + 140).toDouble())).toFloat()
             )
             close()
         }
