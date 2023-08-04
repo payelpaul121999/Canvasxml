@@ -22,41 +22,41 @@ class ArcWithArrowView @JvmOverloads constructor(
         color = Color.BLUE
         style = Paint.Style.FILL
     }
+    private val valueSUBTRACT: Float
+        get() = (width * 0.05f)
+    private val centerPointerX: Float
+        get() = width / 2f
+    private val centerPointerY :Float
+    get() = height / 2f
 
-    private var centerX = 0f
-    private var centerY = 0f
-    private var radius = 0f
     private var arrowSize = 66f
+    private val radiusArrowArc : Float
+    get() = (width / 2f) - (valueSUBTRACT + 30f).toInt()
 
-    // Angle in degrees for rotating the arrow 180 (degree rotation left) to 360 (degree rotation from right)
     private var arrowAngle = 330f
 
     fun setArrowAngle(angle: Float) {
         arrowAngle = angle
-        invalidate() // Redraw the view when the angle changes
+        invalidate()
     }
-
+    private val arcRect: RectF by lazy {
+        RectF(centerPointerX - radiusArrowArc, centerPointerY - radiusArrowArc, centerPointerX + radiusArrowArc, centerPointerY + radiusArrowArc)
+    }
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        // Calculate the center of the view
-        centerX = width / 2f
-        centerY = height / 2f
 
-        // Set the radius of the arc to be the minimum between half of the width and height
-        radius = minOf(width, height) / 2f - arrowSize
+
 
         // Draw the arc
         canvas.drawArc(
-            centerX - radius, centerY - radius, centerX + radius, centerY + radius,
+            centerPointerX - radiusArrowArc, centerPointerY - radiusArrowArc, centerPointerX + radiusArrowArc, centerPointerY + radiusArrowArc,
             -180f, 180f, false, arcPaint
         )
 
         // Calculate the coordinates of the arrow pointer
-        val arrowX = centerX + radius * Math.cos(Math.toRadians(arrowAngle.toDouble())).toFloat()
-        val arrowY = centerY + radius * Math.sin(Math.toRadians(arrowAngle.toDouble())).toFloat()
-
-        // Save the current canvas state to restore it later
+        val arrowX = centerPointerX + radiusArrowArc * Math.cos(Math.toRadians(arrowAngle.toDouble())).toFloat()
+        val arrowY = centerPointerY + radiusArrowArc * Math.sin(Math.toRadians(arrowAngle.toDouble())).toFloat()
         canvas.save()
 
         // Translate and rotate the canvas to draw the arrow at the correct position and angle
@@ -70,8 +70,6 @@ class ArcWithArrowView @JvmOverloads constructor(
         arrowPath.lineTo(-arrowSize, arrowSize)
         arrowPath.close()
         canvas.drawPath(arrowPath, arrowPaint)
-
-        // Restore the canvas to its original state
         canvas.restore()
     }
 }
