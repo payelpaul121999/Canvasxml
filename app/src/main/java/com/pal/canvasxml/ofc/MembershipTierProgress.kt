@@ -23,7 +23,8 @@ class MembershipTierProgress @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr)  {
+) : View(context, attrs, defStyleAttr)
+{
     // Keep track of the bounding rectangles of the bitmaps
     private val bitmapRects = mutableListOf<RectF>()
     private var clickedPointIndex: Int = -1
@@ -265,8 +266,8 @@ class MembershipTierProgress @JvmOverloads constructor(
         // Draw the arrow pointer
         val arrowPath = Path()
         arrowPath.moveTo(0f, 0f)
-        arrowPath.lineTo(-arrowSize,- arrowSize)
-        arrowPath.lineTo(-arrowSize, arrowSize)
+        arrowPath.lineTo(-arrowSize,- arrowSize / 1.9f)
+        arrowPath.lineTo(-arrowSize, arrowSize / 1.9f)
         arrowPath.close()
         canvas.drawPath(arrowPath, arrowPaint)
         canvas.restore()

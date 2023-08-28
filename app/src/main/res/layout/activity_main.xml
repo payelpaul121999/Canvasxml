@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-  <com.pal.canvasxml.MemberShipSemiCircleProgress
+  <com.pal.canvasxml.ofc.MembershipTierProgress
       android:id="@+id/circle"
       android:layout_width="match_parent"
       android:layout_height="220dp"

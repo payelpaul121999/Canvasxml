@@ -29,7 +29,7 @@ class ArcWithArrowView @JvmOverloads constructor(
     private val centerPointerY :Float
     get() = height / 2f
 
-    private var arrowSize = 66f
+    private var arrowSize = 80f
     private val radiusArrowArc : Float
     get() = (width / 2f) - (valueSUBTRACT + 30f).toInt()
 
@@ -66,8 +66,8 @@ class ArcWithArrowView @JvmOverloads constructor(
         // Draw the arrow pointer
         val arrowPath = Path()
         arrowPath.moveTo(0f, 0f)
-        arrowPath.lineTo(-arrowSize,- arrowSize)
-        arrowPath.lineTo(-arrowSize, arrowSize)
+        arrowPath.lineTo(-arrowSize,- arrowSize/2f)
+        arrowPath.lineTo(-arrowSize ,arrowSize /2f)
         arrowPath.close()
         canvas.drawPath(arrowPath, arrowPaint)
         canvas.restore()
