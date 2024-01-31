@@ -7,6 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".NewActivity">
    <com.pal.canvasxml.TriangleShape.ArcWithArrowView
+       android:id="@+id/tex"
        android:layout_width="match_parent"
        android:layout_height="match_parent"/>
+   <TextView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+      android:textSize="30dp"
+      android:text="User Welcome"
+       android:gravity="center"
+       android:layout_marginTop="20dp"
+      app:layout_constraintTop_toTopOf="@+id/tex"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
